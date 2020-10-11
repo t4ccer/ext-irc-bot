@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cdef68c5fd311bcecb3c898916d8262af47fac7ad6b5c597420bf9fdde3b2a70
+-- hash: 3cd47a1fbb61b2d6a9e6f4e718ed9f47d2786c99d081adbe99b1a3c11c893acf
 
 name:           ext-irc-bot
 version:        0.1.0.0
@@ -26,7 +26,10 @@ source-repository head
 
 library
   exposed-modules:
+      Commands
       ExtIrcBot
+      Parsers
+      TCPClient
   other-modules:
       Paths_ext_irc_bot
   hs-source-dirs:
@@ -45,7 +48,7 @@ executable ext-irc-bot-exe
       Paths_ext_irc_bot
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -fwarn-unused-do-bind
   build-depends:
       base >=4.14.0 && <4.14.1
     , bytestring

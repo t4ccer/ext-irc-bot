@@ -30,5 +30,6 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     - -Wall
+    - -fwarn-unused-do-bind
     dependencies:
     - ext-irc-bot
