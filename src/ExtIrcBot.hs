@@ -2,11 +2,13 @@
 
 module ExtIrcBot where
 
-import Commands
-import TCPClient
-import Parsers
+import           Commands
+import           Parsers
+import           TCPClient
 
-runBot :: String -> String -> String -> String -> (Socket -> Command -> IO ()) -> IO ()
+type Handler = (Socket -> Command -> IO ())
+
+runBot :: String -> String -> String -> String -> Handler -> IO ()
 runBot host port name chan handler = runTCPClient host port $ \s -> do
   sendCommand s $ NICK name
   sendCommand s $ USER name name name name
@@ -14,12 +16,12 @@ runBot host port name chan handler = runTCPClient host port $ \s -> do
   mainLoop s handler
 
 
-mainLoop :: Socket -> (Socket -> Command -> IO ()) -> IO ()
+mainLoop :: Socket -> Handler -> IO ()
 mainLoop s handler = do
   msg <- recvUntill s "\n"
   let x = runCommandParser msg
   case x of
-    Left _ -> do 
+    Left _ -> do
       return ()
       -- C.putStrLn msg
     Right v -> do

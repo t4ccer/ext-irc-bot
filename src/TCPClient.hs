@@ -1,14 +1,14 @@
 
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module TCPClient(Socket, sendCommand, recvUntill, runTCPClient) where
 
-import qualified Control.Exception as E
-import qualified Data.ByteString.Char8 as C
-import Network.Socket
-import Network.Socket.ByteString (recv, sendAll)
-import Commands
+import           Commands
+import qualified Control.Exception         as E
+import qualified Data.ByteString.Char8     as C
+import           Network.Socket
+import           Network.Socket.ByteString (recv, sendAll)
 
 type BS = C.ByteString
 
