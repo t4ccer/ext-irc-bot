@@ -12,7 +12,11 @@ extra-source-files:
 description: Please see the README on GitHub at <https://github.com/t4ccer/ext-irc-bot#readme>
 
 dependencies:
-- base >= 4.14.0 && < 4.14.1 
+- base >= 4.14.0 && < 4.14.1
+- bytestring
+- network 
+- string-interpolate
+- megaparsec 
 
 library:
   source-dirs: src
