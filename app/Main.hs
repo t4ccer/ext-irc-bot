@@ -5,25 +5,45 @@
 module Main where
 
 import           Commands                (Command (..))
-import           Control.Monad           (when)
 import           Data.List               (isPrefixOf)
 import           Data.String.Interpolate (i)
-import           ExtIrcBot               (Handler, runBot)
+import           ExtIrcBot
 import           TCPClient               (sendCommand)
 
+botName :: String
+botName = "foobot"
+
+startsWith :: Eq a => [a] -> [a] -> Bool
+startsWith = flip isPrefixOf
+
 main :: IO ()
-main = runBot "irc.freenode.net" "6667" "foobot" "#botwar" handleCommand
+main = runBot BotSettings
+  { host ="irc.freenode.net"
+  , port = "6667"
+  , name = botName
+  , channels = ["#botwar"]
+  , handler =  handleCommand
+  }
+
+handlerNotDefined :: Handler 
+handlerNotDefined _ msg = 
+  putStrLn [i|Handler not defined: for #{msg}|]
+
+handlePrivMsg :: String -> Maybe String
+handlePrivMsg msg
+  | msg == [i|#{botName} help|] = Just [i|Hi, I am reverser bot. Type [#{botName} reverse <msg>] and I will send <msg> reversed|]
+  | msg `startsWith` [i|#{botName} reverse |] = Just $ reverse $ drop (length ([i|#{botName} reverse |] :: String)) msg
+  | otherwise = Nothing
 
 handleCommand :: Handler
 handleCommand s (PING v) = do
-  putStrLn "Sent ping"
   sendCommand s $ PONG v
 
-handleCommand _ (PRIVMSG _ _ "\SOHVERSION\SOH") = do
-  return ()
-
-handleCommand s (PRIVMSG _ c m) = do
-  when ("!r " `isPrefixOf` m) $ sendCommand s $ PRIVMSG "" c $ reverse $ drop 3 m
+handleCommand s (PRIVMSG a c m) = do
+  let res = handlePrivMsg m
+  case res of
+    Just res' -> sendCommand s $ PRIVMSG "" c res'
+    Nothing -> handlerNotDefined s (PRIVMSG a c m) 
 
 handleCommand _ x = do
   putStrLn [i|Handler not defined: for #{x}|]

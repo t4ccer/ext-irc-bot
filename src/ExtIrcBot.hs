@@ -8,24 +8,30 @@ import           TCPClient
 
 type Handler = (Socket -> Command -> IO ())
 
-runBot :: String -> String -> String -> String -> Handler -> IO ()
-runBot host port name chan handler = runTCPClient host port $ \s -> do
-  sendCommand s $ NICK name
-  sendCommand s $ USER name name name name
-  sendCommand s $ JOIN name chan
-  mainLoop s handler
+data BotSettings = BotSettings
+  { host     :: String
+  , port     :: String
+  , name     :: String
+  , channels :: [String]
+  , handler  :: Handler
+  }
 
+runBot :: BotSettings -> IO ()
+runBot s = runTCPClient (host s) (port s) $ \sock -> do
+  sendCommand sock $ NICK (name s)
+  sendCommand sock $ USER (name s) (name s) (name s) (name s)
+  mapM_ (sendCommand sock . JOIN (name s)) (channels s)
+  mainLoop sock (handler s)
 
 mainLoop :: Socket -> Handler -> IO ()
-mainLoop s handler = do
+mainLoop s h = do
   msg <- recvUntill s "\n"
   let x = runCommandParser msg
   case x of
     Left _ -> do
       return ()
-      -- C.putStrLn msg
     Right v -> do
       print v
-      handler s v
+      h s v
       putStrLn ""
-  mainLoop s handler
+  mainLoop s h
