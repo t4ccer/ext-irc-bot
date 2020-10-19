@@ -4,7 +4,7 @@
 
 module TCPClient(Socket, sendCommand, recvUntill, runTCPClient) where
 
-import           Commands
+import           IrcCommands
 import qualified Control.Exception         as E
 import qualified Data.ByteString.Char8     as C
 import           Network.Socket
@@ -13,11 +13,9 @@ import           Network.Socket.ByteString (recv, sendAll)
 type BS = C.ByteString
 
 
-sendCommand :: Socket -> Command -> IO ()
+sendCommand :: Socket -> IrcCommand -> IO ()
 sendCommand s c = do
-  putStr "Sent: "
   let str = C.pack $ stringifyCommand c <> "\r\n"
-  C.putStr str
   sendAll s str
 
 openSocket :: AddrInfo -> IO Socket

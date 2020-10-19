@@ -4,7 +4,7 @@
 
 module Parsers (runCommandParser) where
 
-import           Commands
+import           IrcCommands
 import qualified Data.ByteString.Char8 as C
 import           Data.Void
 import           Text.Megaparsec
@@ -18,7 +18,7 @@ manyAnyToSpace = do
   _ <- optional space
   return v
 
-parseCommand :: Parser Command
+parseCommand :: Parser IrcCommand
 parseCommand = choice $ fmap try
   [ parsePing
   , parsePrivMsg
@@ -26,14 +26,14 @@ parseCommand = choice $ fmap try
   , parsePart
   ]
 
-parsePing :: Parser Command
+parsePing :: Parser IrcCommand
 parsePing = do
   _     <- string "PING"
   _     <- optional space
   p_val <- some $ anySingleBut '\r'
   return $ PING p_val
 
-parsePrivMsg :: Parser Command
+parsePrivMsg :: Parser IrcCommand
 parsePrivMsg = do
   _        <- char ':'
   p_author <- manyAnyToSpace
@@ -44,7 +44,7 @@ parsePrivMsg = do
   p_msg    <- some $ anySingleBut '\r'
   return $ PRIVMSG p_author p_chan p_msg
 
-parsePart :: Parser Command
+parsePart :: Parser IrcCommand
 parsePart = do
   _      <- char ':'
   p_user <- many $ anySingleBut ' '
@@ -54,7 +54,7 @@ parsePart = do
   p_chan <- many $ anySingleBut '\r'
   return $ PART p_user p_chan
 
-parseJoin :: Parser Command
+parseJoin :: Parser IrcCommand
 parseJoin = do
   _      <- char ':'
   p_user <- many $ anySingleBut ' '
@@ -64,5 +64,5 @@ parseJoin = do
   p_chan <- many $ anySingleBut '\r'
   return $ JOIN p_user p_chan
 
-runCommandParser :: C.ByteString -> Either (ParseErrorBundle String Void) Command
+runCommandParser :: C.ByteString -> Either (ParseErrorBundle String Void) IrcCommand
 runCommandParser = parse parseCommand "error" . C.unpack

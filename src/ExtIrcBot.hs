@@ -2,11 +2,12 @@
 
 module ExtIrcBot where
 
-import           Commands
+import           ChatEvents
+import           IrcCommands
 import           Parsers
 import           TCPClient
 
-type Handler = (Socket -> Command -> IO ())
+type Handler = ChatEvent -> ChatAction
 
 data BotSettings = BotSettings
   { host     :: String
@@ -31,7 +32,14 @@ mainLoop s h = do
     Left _ -> do
       return ()
     Right v -> do
-      print v
-      h s v
-      putStrLn ""
+      case v of
+        PING m -> sendCommand s $ PONG m
+        _ -> do
+          let event  = commandToEvent v
+          let action = h event
+          let cmd    = actionToCommand action
+          print event
+          print action
+          putStrLn ""
+          sendCommand s cmd
   mainLoop s h
