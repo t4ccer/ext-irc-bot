@@ -12,16 +12,16 @@ import           TCPClient
 type Handler = ChatEvent -> IO ChatAction
 
 data BotSettings = BotSettings
-  { host           :: String
-  , port           :: String
-  , name           :: String
-  , channels       :: [String]
-  , handler        :: Handler
-  , async_handlers :: Bool
+  { host           :: String   -- ^ IRC server hostname
+  , port           :: Int      -- ^ IRC server port. 6667 by default
+  , name           :: String   -- ^ Bot name
+  , channels       :: [String] -- ^ Channels that bot'll join after start
+  , handler        :: Handler  -- ^ Chat event handler function
+  , async_handlers :: Bool     -- ^ If True each handler will be called with forkIO
   }
 
 runBot :: BotSettings -> IO ()
-runBot s = runTCPClient (host s) (port s) $ \sock -> do
+runBot s = runTCPClient (host s) (show $ port s) $ \sock -> do
   sendCommand sock $ NICK (name s)
   sendCommand sock $ USER (name s) (name s) (name s) (name s)
   mapM_ (sendCommand sock . JOIN (name s)) (channels s)
