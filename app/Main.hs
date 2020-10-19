@@ -19,6 +19,7 @@ main = runBot BotSettings
   , name = botName
   , channels = ["#botwar"]
   , handler =  handleEvent
+  , async_handlers = False
   }
 
 handleEvent :: Handler
