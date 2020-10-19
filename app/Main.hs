@@ -22,6 +22,6 @@ main = runBot BotSettings
   }
 
 handleEvent :: Handler
-handleEvent (UserJoined u c) = SendChannelMessage c [i|Hello #{humanizeName u}|]
-handleEvent (ChannelMessage u c m) = SendChannelMessage c [i|#{humanizeName u} said: #{m}|]
-handleEvent _ = NoAction
+handleEvent (UserJoined u c)       = return $ SendChannelMessage c [i|Hello #{humanizeName u}|]
+handleEvent (ChannelMessage u c m) = return $ SendChannelMessage c [i|#{humanizeName u} said: #{m}|]
+handleEvent _                      = return $ NoAction

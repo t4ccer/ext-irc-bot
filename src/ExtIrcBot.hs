@@ -7,7 +7,7 @@ import           IrcCommands
 import           Parsers
 import           TCPClient
 
-type Handler = ChatEvent -> ChatAction
+type Handler = ChatEvent -> IO ChatAction
 
 data BotSettings = BotSettings
   { host     :: String
@@ -36,7 +36,7 @@ mainLoop s h = do
         PING m -> sendCommand s $ PONG m
         _ -> do
           let event  = commandToEvent v
-          let action = h event
+          action <- h event
           let cmd    = actionToCommand action
           print event
           print action
