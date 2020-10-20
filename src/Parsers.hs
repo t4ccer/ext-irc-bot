@@ -64,5 +64,6 @@ parseJoin = do
   p_chan <- many $ anySingleBut '\r'
   return $ JOIN p_user p_chan
 
+-- | Runs `IrcCommand` parser
 runCommandParser :: C.ByteString -> Either (ParseErrorBundle String Void) IrcCommand
 runCommandParser = parse parseCommand "error" . C.unpack

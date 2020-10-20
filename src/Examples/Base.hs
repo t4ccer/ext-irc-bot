@@ -14,4 +14,4 @@ run = runBot BotSettings
   }
 
 handleEvent :: Handler
-handleEvent _ = return $ NoAction
+handleEvent _ = return NoAction

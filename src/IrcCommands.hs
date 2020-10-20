@@ -53,7 +53,7 @@ stringifyCommand NoCommad        = ""
 commandToEvent :: IrcCommand -> ChatEvent
 commandToEvent cmd = case cmd of
   JOIN u c            -> UserJoined u c
-  PART u c            -> UserLeft   u c
+  PART u c            -> UserLeft u c
   PRIVMSG u ('#':c) m -> ChannelMessage u ('#':c) m
   PRIVMSG u _ m       -> PrivMessage u m
   _                   -> OtherEvent $ show cmd

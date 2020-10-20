@@ -29,12 +29,12 @@ runBot s = runTCPClient (host s) (show $ port s) $ \sock -> do
 
 mainLoop :: Socket -> BotSettings -> IO ()
 mainLoop s set = do
-  msg <- recvUntill s "\n"
+  msg <- recvUntill s '\n' 
   let x = runCommandParser msg
   case x of
     Left _ -> do
       return ()
-    Right v -> if async_handlers set == True
+    Right v -> if async_handlers set
       then void $ forkIO $ handleCommand s v $ handler set
       else handleCommand s v $ handler set
   mainLoop s set
@@ -45,9 +45,9 @@ handleCommand s cmd h = case cmd of
     _ -> do
       let event  = commandToEvent cmd
       action <- h event
-      let cmd    = actionToCommand action
+      let cmd'    = actionToCommand action
       print event
       print action
       putStrLn ""
-      sendCommand s cmd
+      sendCommand s cmd'
 

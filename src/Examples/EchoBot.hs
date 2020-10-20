@@ -16,4 +16,4 @@ run = runBot BotSettings
 
 handleEvent :: Handler
 handleEvent (ChannelMessage u c m) = return $ SendChannelMessage c (humanizeName u ++ " said: " ++ m)
-handleEvent _ = return $ NoAction
+handleEvent _ = return NoAction

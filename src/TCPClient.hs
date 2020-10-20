@@ -12,27 +12,28 @@ import           Network.Socket.ByteString (recv, sendAll)
 
 type BS = C.ByteString
 
-
+-- | Sends `IrcCommands` through `Socket` connected to IRC server
 sendCommand :: Socket -> IrcCommand -> IO ()
 sendCommand s c = do
   let str = C.pack $ stringifyCommand c <> "\r\n"
   sendAll s str
 
+-- | Resolves address and opens `Socket`
 openSocket :: AddrInfo -> IO Socket
 openSocket addr = socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
 
-recvUntill :: Socket -> BS -> IO BS
+-- | Receives from socket unitl received certain Char
+recvUntill :: Socket -> Char -> IO BS
 recvUntill s c = go s c ""
   where
-    go :: Socket -> BS -> BS -> IO BS
+    go :: Socket -> Char -> BS -> IO BS
     go s' c' buf = do
       new <- recv s 1
-      if new == c'
+      if new == C.singleton c'
         then return buf
         else go s' c' $ buf <> new
 
-
--- from the "network-run" package.
+-- | From the "network-run" package.
 runTCPClient :: HostName -> ServiceName -> (Socket -> IO a) -> IO a
 runTCPClient host port client = withSocketsDo $ do
   addr <- resolve
